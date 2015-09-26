@@ -1,0 +1,36 @@
+﻿<Window x:Class="DesktopTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="308"
+        ResizeMode="NoResize"
+        x:Name="Window">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="99"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Image Source="{Binding ElementName=Window, Path=ImageSource}" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="5"/>
+
+        <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Horizontal">
+            <Label>X:</Label>
+            <TextBox Text="{Binding ElementName=Window, Path=XBlocksCount}" Width="30"/>
+            <Label>Y:</Label>
+            <TextBox Text="{Binding ElementName=Window, Path=YBlocksCount}" Width="30"/>
+        </StackPanel>
+
+        <Button Grid.Row="3" Grid.Column="1" Click="OpenFileButton_OnClick" >Open image</Button>
+        <Button Grid.Row="3" Grid.Column="5" Click="CreatePuzzleButton_OnClick">Create puzzle</Button>
+    </Grid>
+</Window>
