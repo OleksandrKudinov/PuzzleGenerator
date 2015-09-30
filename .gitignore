@@ -1,0 +1,9 @@
+PuzzleGenerator/WebDemo/obj/Debug/
+PuzzleGenerator/PuzzleGenerator/obj/
+PuzzleGenerator/DesctopTest/obj/
+PuzzleGenerator/packages/Microsoft.AspNet.WebApi.Client.5.2.2/lib/net45/System.Net.Http.Formatting.xml
+PuzzleGenerator/packages/
+PuzzleGenerator/ConsoleTest/obj/
+PuzzleGenerator/ConsoleTest/bin/
+PuzzleGenerator/DesctopTest/bin/
+PuzzleGenerator/WebDemo/bin/
