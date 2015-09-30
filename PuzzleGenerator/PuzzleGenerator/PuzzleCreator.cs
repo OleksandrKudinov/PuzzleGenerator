@@ -33,10 +33,9 @@ namespace PuzzleGenerator
             var ySize = sourceImage.Height / yPartsCount;
             var blockSize = new Size(xSize, ySize);
 
-
-            for (var xPart = 0; xPart < xPartsCount; xPart++)
+            for (var yPart = 0; yPart < yPartsCount; yPart++)
             {
-                for (var yPart = 0; yPart < yPartsCount; yPart++)
+                for (var xPart = 0; xPart < xPartsCount; xPart++)    
                 {
                     var srcPoint = new Point(xPart * xSize, yPart * ySize);
                     var r = new Rectangle(srcPoint, blockSize);
@@ -82,9 +81,9 @@ namespace PuzzleGenerator
 
             using (Graphics generatedBitmapGraphics = Graphics.FromImage(generatedBitmap))
             {
-                for (var xPart = 0; xPart < xParts; xPart++)
+                for (var yPart = 0; yPart < yParts; yPart++)
                 {
-                    for (var yPart = 0; yPart < yParts; yPart++)
+                    for (var xPart = 0; xPart < xParts; xPart++)
                     {
                         var image = bitmaps.Dequeue();
                         var generatedBitmapPoint = new Point(xPart * xSize, yPart * ySize);
