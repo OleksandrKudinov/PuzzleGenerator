@@ -1,0 +1,269 @@
+﻿<html>
+<head>
+    <title>Puzzles</title>
+</head>
+<body>
+    <input id="uri" type="text" />
+    <input id="x" type="text" value="4" />
+    <input id="y" type="text" value="4" />
+    <button id="createPuzzleButton">Create puzzle</button>
+
+    <table id="puzzle"></table>
+    <img id="normalImage" />
+
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script>
+        var puzzles = (function () {
+            var context = this;
+
+            this.counter = 0;
+            this.normalUrls = [];
+            this.puzzleMatrix = [];
+
+            this.width = 0;
+            this.height = 0;
+            context.lastImage = {};
+
+            this.loadImage = function () {
+
+                $("#createPuzzleButton").click(
+                    function () {
+                        var uri = $("#uri").val();
+                        context.width = 0 + $("#x").val();
+                        context.height = 0 + $("#y").val();
+                        context.emptyPositionX = context.width - 1;
+                        context.emptyPositionY = context.height - 1;
+                        $.ajax({
+                            url: "/Home/UploadImage?uri=" + uri + "&x=" + $("#x").val() + "&y=" + $("#y").val(),
+                            success: context.initialize
+                        });
+                    });
+
+                $("body").keydown(function (event) {
+                    switch (event.keyCode) {
+                        case 37:
+                            context.moveLeft();
+                            break;
+                        case 38:
+                            context.moveUp();
+                            break;
+                        case 39:
+                            context.moveRight();
+                            break;
+                        case 40:
+                            context.moveDown();
+                            break;
+                        default:break;
+                    }
+                    context.refreshView();
+                });
+            };
+
+            this.initialize = function (data) {
+                context.normalUrls = data;
+                console.log(data);
+                context.initializeMatrix();
+                context.matrixShuffle();
+                context.refreshView();
+            };
+
+            this.makeImage = function (uri) {
+                var td = document.createElement("td");
+                var html = '<img src="' + uri + '">';
+                $(td).html(html);
+                $(td).css("height", "30px");
+                $(td).css("width", "30px");
+                return td;
+            };
+
+            this.initializeMatrix = function () {
+                var width = context.width;
+                var height = context.height;
+                var normalUrls = context.normalUrls;
+                var normalImages = [];
+
+                for (var i = 0; i < normalUrls.length; i++) {
+                    var imageUrl = normalUrls[i];
+                    var image = context.makeImage(imageUrl);
+                    normalImages.push(image);
+                }
+
+                var tmpImages = [];
+                var lastIndex = normalImages.length - 1;
+
+                for (var i = 0; i < lastIndex; i++) {
+                    tmpImages.push(normalImages[i]);
+                }
+
+                var suffledImages = context.shuffle(tmpImages);
+                //var suffledImages = tmpImages;
+
+                console.log(suffledImages);
+
+                context.lastImage = normalImages[lastIndex];
+                $(context.lastImage).css("visibility", "hidden");
+                suffledImages.push(context.lastImage);
+
+                var puzzleMatrix = [];
+
+                var count = 0;
+
+                for (var y = 0; y < height; y++) {
+                    puzzleMatrix.push([]);
+                    for (var x = 0; x < width; x++) {
+                        var imageNumber = count++;
+                        var item = suffledImages[imageNumber];
+                        puzzleMatrix[y].push(item);
+                    }
+                }
+
+                context.puzzleMatrix = puzzleMatrix;
+            };
+
+            this.shuffle = function (array) {
+                var currentIndex = array.length, temporaryValue, randomIndex;
+
+                // While there remain elements to shuffle...
+                while (0 !== currentIndex) {
+
+                    // Pick a remaining element...
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
+
+                    // And swap it with the current element.
+                    temporaryValue = array[currentIndex];
+                    array[currentIndex] = array[randomIndex];
+                    array[randomIndex] = temporaryValue;
+                }
+
+                return array;
+            }
+
+            this.matrixShuffle = function() {
+                for (var i = 0; i < 1000; i++) {
+                    switch (Math.random()%4) {
+                    case 0:context.moveUp();break;
+                    case 1:context.moveDown();break;
+                    case 2:context.moveLeft();break;
+                    case 3:context.moveRight();break;
+                    default:break;
+                    }
+                }
+
+                //context.moveUp();
+                //context.moveUp();
+                //context.moveUp();
+                //context.moveLeft();
+                //context.moveLeft();
+                //context.moveLeft();
+            };
+
+            this.isCompleted = function () {
+                
+                var currentSiquence = [];
+
+                for (var y = 0; y < height; y++) {
+                    for (var x = 0; x < width; x++) {
+                        currentSiquence.push(context.puzzleMatrix[y][x].src);
+                    }
+                }
+
+                for (var i = 0; i < context.normalUrls.length; i++) {
+                    if (currentSiquence[i] != context.normalUrls[i]) {
+                        console.log("no");
+                        return;
+                    }
+                    $(context.lastImage).css("visibility", "visible");
+                    alert("congratilation!");
+                }
+            };
+
+            this.refreshView = function () {
+                var width = context.width;
+                var height = context.height;
+                var array = context.puzzleMatrix;
+
+                $("#puzzle").empty();
+
+                for (var y = 0; y < height; y++) {
+                    var tr = document.createElement("tr");
+                    for (var x = 0; x < width; x++) {
+                        var td = array[y][x];
+                        var copy = $(td).clone()[0];
+                        tr.appendChild(copy);
+                    }
+                    $("#puzzle").append(tr);
+                }
+
+                context.isCompleted();
+            };
+
+            this.moveUp = function () {
+                var y = context.emptyPositionY;
+                var x = context.emptyPositionX;
+                var array = context.puzzleMatrix;
+
+                var maxY = context.height - 1;
+
+                if (y < maxY) {
+                    var neighborItem = array[y + 1][x];
+                    var emptyItem = array[y][x];
+                    array[y + 1][x] = emptyItem;
+                    array[y][x] = neighborItem;
+                    context.emptyPositionY++;
+                }
+            };
+
+            this.moveDown = function () {
+                var y = context.emptyPositionY;
+                var x = context.emptyPositionX;
+                var array = context.puzzleMatrix;
+
+                if (y > 0) {
+                    var emptyItem = array[y][x];
+                    var neighborItem = array[y - 1][x];
+                    array[y - 1][x] = emptyItem;
+                    array[y][x] = neighborItem;
+                    context.emptyPositionY--;
+                }
+            };
+
+            this.moveLeft = function () {
+                var y = context.emptyPositionY;
+                var x = context.emptyPositionX;
+                var array = context.puzzleMatrix;
+
+                var maxX = context.width - 1;
+
+                if (x < maxX) {
+                    var neighborItem = array[y][x + 1];
+                    var emptyItem = array[y][x];
+                    array[y][x + 1] = emptyItem;
+                    array[y][x] = neighborItem;
+                    context.emptyPositionX++;
+                }
+            };
+
+            this.moveRight = function () {
+                var y = context.emptyPositionY;
+                var x = context.emptyPositionX;
+                var array = context.puzzleMatrix;
+
+                if (x > 0) {
+                    var emptyItem = array[y][x];
+                    var neighborItem = array[y][x - 1];
+                    array[y][x - 1] = emptyItem;
+                    array[y][x] = neighborItem;
+                    context.emptyPositionX--;
+                }
+            };
+
+            this.itemClick = function () { };
+
+            this.loadImage();
+
+            return context;
+        })();
+    </script>
+</body>
+</html>
